@@ -6,6 +6,9 @@ function()
         local in_instance, instance_type = IsInInstance()
         
         if sourceGUID == UnitGUID("player") then
+            -- Fix issue where players dispels their own debuff (ie. Displacement dispelling movement impairing effects)
+            if destGUID == UnitGUID("player") then return end
+            
             local spellId, spellName, spellSchool, amount = select(12, CombatLogGetCurrentEventInfo())
             
             if destName:sub(-1):find('[sxzSXZ]') then
@@ -13,10 +16,8 @@ function()
             else
                 destName = destName .. "'s"
             end
-            
-            -- DEBUG
-            print(sourceGUID, destGUID)
-            
+
+            -- If not in instance, just print - due to restriction to automated messages in /say channel
             if in_instance == false then
                 print("Dispelled " .. destName .. " " .. GetSpellLink(amount))
             else
